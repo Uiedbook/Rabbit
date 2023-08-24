@@ -11,11 +11,18 @@
 A bare bone Text Editor library for javascript
 Aimed to be small, simple, efficient and easy to extend.
     <br/>
+    <br/>
+    <a href="https://fridaycandour.github.io/Rabbit/index.html" align="center">
+    <h1 align="center">Live Example</h1>
+    </a>
     <br/> 
+    <br/>
+ <div align="center">
     .
     <a href="https://github.com/fridaycandour/cradova/issues">Report Bug</a>
     .
     <a href="https://github.com/fridaycandour/cradova/issues">Request Feature</a>
+</div>
   </p>
 </p>
  
