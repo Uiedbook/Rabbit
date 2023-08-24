@@ -28,7 +28,7 @@ import { Rabbit } from "./rabbit.js";
 
 const BigFatRabbit = new Rabbit();
 
-BigFatRabbit.installOn("pub");
+BigFatRabbit.installOn("pub"); // #pub div install point
 ```
 
 Now you will get a working text editor, which comes with default actions and tools.
