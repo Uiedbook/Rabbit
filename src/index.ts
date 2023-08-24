@@ -81,4 +81,41 @@ BigFatRabbit.installTool("Image", {
   },
 });
 
+BigFatRabbit.installTool("Link", {
+  text: "Inset link",
+  tooling({ selectedElement, selection, range }) {
+    console.log(selection, selectedElement);
+    const url = prompt("Enter URL:");
+    if (url) {
+      const link = document.createElement("a");
+      link.href = url;
+      link.textContent = selection;
+      range!.deleteContents();
+      range!.insertNode(link);
+    }
+  },
+});
+
+BigFatRabbit.installTool("Alignment", {
+  text: "center Alignment",
+  tooling({ selectedElement, selection, range }) {
+    console.log(selection, selectedElement);
+    if (selection) {
+      const alignedContainer = document.createElement("div");
+      alignedContainer.style.textAlign = "center";
+      alignedContainer.appendChild(range!.extractContents());
+      range!.insertNode(alignedContainer);
+    }
+  },
+});
+
+BigFatRabbit.installAction("paste", (e: any) => {
+  e.preventDefault();
+  const clipboardData =
+    e.clipboardData ||
+    (window as unknown as { clipboardData: object }).clipboardData;
+  const pastedText = clipboardData.getData("text/plain");
+  document.execCommand("insertHTML", false, pastedText);
+});
+
 BigFatRabbit.installOn("pub");

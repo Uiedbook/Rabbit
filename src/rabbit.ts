@@ -18,7 +18,7 @@ export class Rabbit {
   selection: string | null = null;
   selectedElement: HTMLParagraphElement | null = null;
   range: Range | null = null;
-  _actionList: Record<ACTION_TYPES, (() => void)[]> = {
+  _actionList: Record<ACTION_TYPES, ((e: any) => void)[]> = {
     input: [],
     paste: [],
     copy: [],
@@ -68,7 +68,7 @@ export class Rabbit {
     //! checking type
     this._toolsList[name] = tool;
   }
-  installAction(type: ACTION_TYPES, action: () => void) {
+  installAction(type: ACTION_TYPES, action: (e: any) => void) {
     //! checking type
     if (this._actionList[type]) {
       this._actionList[type].push(action);
