@@ -1,20 +1,28 @@
-<center >
-
+<br/>
+<p align="center">
+  <a href="https://github.com/fridaycandour/rabbit">
 <img src="./src/rabbit.png" width='200' >
 </img>
+  </a>
 
-# Rabbit.js
+  <h1 align="center">Rabbit.js</h1>
 
-An extensible Text Editor library for javascript
-
+  <p align="center">
+An bare bone Text Editor library for javascript
 Aimed to be small, simple, efficient and easy to extend.
-
-</center>
-
+    <br/>
+    <br/> 
+    .
+    <a href="https://github.com/fridaycandour/cradova/issues">Report Bug</a>
+    .
+    <a href="https://github.com/fridaycandour/cradova/issues">Request Feature</a>
+  </p>
+</p>
+ 
 Example Rabbit setup
 
 ```js
-import { Rabbit } from "rabbit";
+import { Rabbit } from "./rabbit.js";
 
 // creating a Rabbit instance
 
@@ -47,8 +55,8 @@ more docs will be added later
 
 ```js
 
-// creating a rabbit instance
-const BigFatRabbit = new Rabbit();
+// Extending Rabbit.js
+
 
 BigFatRabbit.installTool("Bold", {
   text: "Bold Button",
@@ -183,5 +191,14 @@ BigFatRabbit.installTool("custom", {
   },
 });
 ```
+
+ACTION TYPES includes
+
+- "input"
+- "paste"
+- "copy"
+- "contextmenu"
+- "document-event name"
+- "custom synthetic actions"
 
 # Rabbit is MIT
