@@ -4,7 +4,7 @@ import { Rabbit } from "./rabbit";
 const BigFatRabbit = new Rabbit();
 
 BigFatRabbit.installTool("Bold", {
-  text: "Bold Button",
+  image: "./src/icons/txt.png",
   tooling({ selectedElement, selection, range }) {
     console.log(selection, selectedElement);
     if (selectedElement) {
@@ -28,7 +28,7 @@ BigFatRabbit.installTool("Bold", {
 });
 
 BigFatRabbit.installTool("Color", {
-  text: "Color Button",
+  image: "./src/icons/txt.png",
   tooling({ selectedElement, selection, range }) {
     console.log(selection, selectedElement);
     const input = document.createElement("input");
@@ -58,9 +58,9 @@ BigFatRabbit.installTool("Color", {
 });
 
 BigFatRabbit.installTool("Image", {
-  text: "Inset image",
+  image: "./src/icons/img.png",
   tooling({ selectedElement, selection, range }) {
-    console.log(selection, selectedElement);
+    console.log({ selection, selectedElement });
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
@@ -72,12 +72,11 @@ BigFatRabbit.installTool("Image", {
         reader.onload = (e) => {
           const img = document.createElement("img");
           img.src = e.target!.result as string;
-          range!.insertNode(img);
+          selectedElement?.insertAdjacentElement("afterend", img);
         };
         reader.readAsDataURL(file);
       }
     });
-    input.click();
   },
 });
 
@@ -114,8 +113,25 @@ BigFatRabbit.installAction("paste", (e: any) => {
   const clipboardData =
     e.clipboardData ||
     (window as unknown as { clipboardData: object }).clipboardData;
-  const pastedText = clipboardData.getData("text/plain");
-  document.execCommand("insertHTML", false, pastedText);
+  const text = clipboardData.getData("text/plain");
+  const file = clipboardData.files[0];
+
+  if (file && file.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = document.createElement("img");
+      img.src = e.target!.result as string;
+      console.log({ sel: BigFatRabbit.selectedElement });
+      BigFatRabbit.selectedElement?.insertAdjacentElement("afterend", img);
+    };
+    reader.readAsDataURL(file);
+  }
+  // if (text) {
+  //   BigFatRabbit.selectedElement?.insertAdjacentElement("afterend", text);
+  // }
+
+  // console.log({ pastedText, pastedImg });
+  // document.execCommand("insertHTML", false, pastedText);
 });
 
 BigFatRabbit.installOn("pub");

@@ -35,15 +35,20 @@ html {
   margin: 0px auto;
   margin-top: 6vh;
   overflow-y: scroll;
-  flex-wrap: wrap;
   background-color: hsl(0, 0%, 90%);
   outline: none;
   display: flex;
   flex-direction: column;
 }
 .rabbit-editor-container img {
-  width: 50%;
-  margin: auto;
+  width: 40%;
+  /* margin: auto; */
+}
+
+.rabbit-editor-container img:hover {
+  border: 1px goldenrod solid !important;
+  border-radius: 8px;
+  padding: 1rem;
 }
 
 .rabbit-tool-container {
@@ -60,6 +65,10 @@ html {
 .rabbit-tool-container.mobile {
   bottom: 0;
   top: unset;
+}
+
+.rabbit-tool-container img.rabbit-tool {
+  max-width: 28px;
 }
 
 .rabbit-editor-container.mobile {

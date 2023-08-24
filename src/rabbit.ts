@@ -1,4 +1,4 @@
-import { button, img } from "cradova";
+import { button, img, p } from "cradova";
 import { throttle } from "./tools";
 import {
   ACTION_TYPES,
@@ -91,12 +91,17 @@ export class Rabbit {
         if (lineText && node.parentNode?.nodeName !== "P") {
           const pElement = document.createElement("p");
           pElement.textContent = lineText;
-          // @ts-ignore
-          node.remove();
-          range.deleteContents();
-          range.insertNode(pElement);
-          selection.removeRange(range);
-          this._el.focus();
+          if (!node.parentNode!.id) {
+            node.parentNode!.insertAdjacentElement("afterend", pElement);
+            node.parentNode!.remove();
+          } else {
+            // @ts-ignore
+            node.remove();
+            range.deleteContents();
+            range.insertNode(pElement);
+            selection.removeRange(range);
+            this._el.focus();
+          }
         }
       }
       this._el.focus();
@@ -121,12 +126,12 @@ export class Rabbit {
       }
     };
     // auto format
-    const auto_format_throttler = throttle(autoformat, 500);
+    // const auto_format_throttler = throttle(autoformat, 0);
     // auto save
     const auto_save_throttler = throttle(() => {
       this._saveState();
     }, this._STACKING_TIME);
-    this._actionList["input"].push(auto_save_throttler, auto_format_throttler);
+    this._actionList["input"].push(auto_save_throttler, autoformat);
     this._actionList["document-selectionchange"].push(getSelection);
   }
   _createDefaultTools() {
