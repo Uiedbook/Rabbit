@@ -13,7 +13,7 @@ Aimed to be small, simple, efficient and easy to extend.
     <br/>
     <br/>
     <a href="https://fridaycandour.github.io/Rabbit/index.html" align="center">
-    <h1 align="center">Live Example</h1>
+    Live Example
     </a>
     <br/> 
     <br/>
