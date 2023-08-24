@@ -8,7 +8,7 @@
   <h1 align="center">Rabbit.js</h1>
 
   <p align="center">
-An bare bone Text Editor library for javascript
+A bare bone Text Editor library for javascript
 Aimed to be small, simple, efficient and easy to extend.
     <br/>
     <br/> 
