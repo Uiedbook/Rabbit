@@ -2,6 +2,8 @@
 
 export type BEHAVIOR_TYPES =
   | "Bold"
+  | "Color"
+  | "BackgroundColor"
   | "Italic"
   | "Underline"
   | "Strikethrough"

@@ -1,3 +1,4 @@
+import { button, img } from "cradova";
 import { throttle } from "./tools";
 import {
   ACTION_TYPES,
@@ -37,8 +38,12 @@ export class Rabbit {
   }
   installOn(id: string = "pub") {
     const el = document.getElementById(id)!;
+    if (window.innerWidth < 600) {
+      el.className = "rabbit-editor-container mobile";
+    } else {
+      el.className = "rabbit-editor-container";
+    }
     el!.contentEditable = "true";
-    el!.innerHTML = `<p></p>`;
     this._el = el;
     this._createDefaultTools();
     this._createDefaultActions();
@@ -86,10 +91,12 @@ export class Rabbit {
         if (lineText && node.parentNode?.nodeName !== "P") {
           const pElement = document.createElement("p");
           pElement.textContent = lineText;
-          range.deleteContents();
-          range.insertNode(pElement);
           // @ts-ignore
           node.remove();
+          range.deleteContents();
+          range.insertNode(pElement);
+          selection.removeRange(range);
+          this._el.focus();
         }
       }
       this._el.focus();
@@ -102,7 +109,8 @@ export class Rabbit {
         const node = range.startContainer;
         const lineText = node.textContent || "";
         if (lineText && node.parentNode?.nodeName === "P") {
-          this.selection = lineText as unknown as string;
+          this.selection = range.toString() as unknown as string;
+          // this.selection = lineText as unknown as string;
           this.selectedElement =
             node.parentNode as unknown as HTMLParagraphElement;
           this.range = range as typeof range;
@@ -112,11 +120,13 @@ export class Rabbit {
         }
       }
     };
+    // auto format
+    const auto_format_throttler = throttle(autoformat, 500);
     // auto save
-    const throttler = throttle(() => {
+    const auto_save_throttler = throttle(() => {
       this._saveState();
     }, this._STACKING_TIME);
-    this._actionList["input"].push(throttler, autoformat);
+    this._actionList["input"].push(auto_save_throttler, auto_format_throttler);
     this._actionList["document-selectionchange"].push(getSelection);
   }
   _createDefaultTools() {
@@ -139,15 +149,28 @@ export class Rabbit {
   }
   _installTools() {
     const toolContainer = document.createElement("div");
-    toolContainer.className = "tool-container";
+    if (window.innerWidth < 600) {
+      toolContainer.className = "rabbit-tool-container mobile";
+    } else {
+      toolContainer.className = "rabbit-tool-container";
+    }
     for (const command in this._toolsList) {
-      const button = document.createElement("button");
-      button.innerText =
-        this._toolsList[command].image ||
-        this._toolsList[command].text ||
-        this._toolsList[command].html;
-      button.addEventListener("click", () => this._apply(command));
-      toolContainer.appendChild(button);
+      let l: HTMLElement | null = null;
+      if (this._toolsList[command].image) {
+        l = img({
+          src: this._toolsList[command].image,
+          className: "rabbit-tool",
+        });
+      }
+      if (this._toolsList[command].text) {
+        l = button(this._toolsList[command].text, { className: "rabbit-tool" });
+      }
+      if (this._toolsList[command].html) {
+        this._toolsList[command].html.className = "rabbit-tool";
+        l = this._toolsList[command].html;
+      }
+      l!.addEventListener("click", () => this._apply(command));
+      toolContainer.appendChild(l!);
     }
     this._el.parentElement?.appendChild(toolContainer);
   }
@@ -158,7 +181,7 @@ export class Rabbit {
       selection: this.selection,
       range: this.range,
     });
-    // this._el.focus();
+    this._el.focus();
   }
   // Method for saving editor state
   _saveState() {
@@ -194,7 +217,6 @@ export class Rabbit {
     }
   }
   _ActivateActions() {
-    // on-tools
     for (const [type, actions] of Object.entries(this._actionList)) {
       for (let i = 0; i < actions.length; i++) {
         if (type.includes("document-")) {
