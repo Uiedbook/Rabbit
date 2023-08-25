@@ -1,5 +1,8 @@
-import { button, img, p } from "cradova";
+import { button, div, img, p } from "cradova";
 import { throttle } from "./tools";
+import redo from "./icons/redo.png";
+import undo from "./icons/undo.png";
+
 import {
   ACTION_TYPES,
   BEHAVIOR_TYPES,
@@ -9,11 +12,13 @@ import {
 
 export class Rabbit {
   _el: HTMLElement;
+  _Mel: HTMLElement;
   _undoStack: string[] = [];
   _redoStack: string[] = [];
   _STACK_SIZE: number = 1000;
   _STACKING_TIME: number = 600;
   _toolsList = {};
+  _modalList = {};
   _syntheticActionList = [];
   selection: string | null = null;
   selectedElement: HTMLParagraphElement | null = null;
@@ -76,6 +81,19 @@ export class Rabbit {
       this._actionList[type] = [action];
     }
   }
+  installModalTool(call: string, html: () => HTMLElement) {
+    this._modalList[call] = html as () => HTMLElement;
+  }
+  showModal(call: string, data) {
+    this._Mel.innerHTML = "";
+    this._Mel.appendChild(this._modalList[call](data));
+    this._Mel.classList.remove("in-active");
+    this._Mel.classList.add("active");
+  }
+  hideModal() {
+    this._Mel.classList.remove("active");
+    this._Mel.classList.add("in-active");
+  }
   fireSyntheticAction(type: SyntheticAction) {
     // @ts-ignore
     this._syntheticActionList[type]?.call();
@@ -137,13 +155,13 @@ export class Rabbit {
   _createDefaultTools() {
     const ins = this;
     this._toolsList["redo"] = {
-      text: "Redo",
+      image: redo,
       tooling() {
         ins._redo();
       },
     };
     this._toolsList["undo"] = {
-      text: "Undo",
+      image: undo,
       tooling() {
         ins._undo();
         if (ins._undoStack.length > ins._STACK_SIZE) {
@@ -154,10 +172,14 @@ export class Rabbit {
   }
   _installTools() {
     const toolContainer = document.createElement("div");
+    const modal = document.createElement("div");
+
     if (window.innerWidth < 600) {
       toolContainer.className = "rabbit-tool-container mobile";
+      modal.className = "rabbit-modal mobile";
     } else {
       toolContainer.className = "rabbit-tool-container";
+      modal.className = "rabbit-modal";
     }
     for (const command in this._toolsList) {
       let l: HTMLElement | null = null;
@@ -175,10 +197,14 @@ export class Rabbit {
         l = this._toolsList[command].html;
       }
       l!.addEventListener("click", () => this._apply(command));
+      l!.title = command;
       toolContainer.appendChild(l!);
     }
+    toolContainer.appendChild(modal);
+    this._Mel = modal;
     this._el.parentElement?.appendChild(toolContainer);
   }
+
   async _apply(command) {
     const fn = this._toolsList[command].tooling;
     fn({

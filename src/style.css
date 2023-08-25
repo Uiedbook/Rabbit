@@ -12,6 +12,15 @@ html {
   box-sizing: border-box;
   font-weight: unset;
 }
+p {
+  transition: color 0.6s ease-in-out;
+}
+
+p:hover,
+p:active,
+p:focus {
+  color: #444141;
+}
 
 ::-webkit-scrollbar {
   width: 4px !important;
@@ -39,6 +48,10 @@ html {
   outline: none;
   display: flex;
   flex-direction: column;
+  background-image: url(./rabbit-bg.png);
+  background-size: 16%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 .rabbit-editor-container img {
   width: 40%;
@@ -56,6 +69,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  position: relative;
   width: 100%;
   position: fixed;
   top: 0;
@@ -71,7 +85,81 @@ html {
   max-width: 28px;
 }
 
+.rabbit-tool-container .rabbit-tool {
+  cursor: pointer;
+}
+
 .rabbit-editor-container.mobile {
+  background-size: 37%;
   margin-top: 0px;
   margin-bottom: 6vh;
+}
+
+.rabbit-modal {
+  /* border: 1px red solid; */
+  position: fixed;
+  transform: scale(0);
+  min-height: 50vh;
+  min-width: 60vh;
+  top: 20vh;
+  background-color: hsl(0, 0%, 90%);
+  padding: 1rem;
+  border-radius: 8px;
+  margin: auto;
+  box-shadow: 0px 8px 30px rgba(128, 128, 128, 0.7);
+}
+
+.rabbit-modal.mobile {
+  min-height: 60vh;
+  min-width: 90vh;
+}
+
+.rabbit-modal.active {
+  animation: mu 0.5s ease-in forwards;
+}
+.rabbit-modal.in-active {
+  animation: md 0.3s ease-in forwards;
+}
+
+.flex-x {
+  display: flex;
+  align-items: center;
+}
+
+.mw {
+  width: 100%;
+}
+
+.flex-cx {
+  justify-content: space-between;
+}
+
+.flex-y {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.flex-c {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes mu {
+  from {
+    transform: scale(0.5);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes md {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0);
+  }
 }

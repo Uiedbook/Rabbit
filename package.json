@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cradova": "^3.1.3",
+    "cradova": "file:../../cradova-3.1.3.tgz",
     "vite": "^4.4.9"
   }
 }

@@ -17,6 +17,7 @@ export type BEHAVIOR_TYPES =
   | "Indentation"
   | "OrderedList"
   | "UnorderedList"
+  | "Asset"
   | "Link"
   | "Image"
   | "Undo"
