@@ -4,10 +4,6 @@
   "description": "A bare bone Text Editor library for javascript, Aimed to be small, simple, efficient and easy to extend.",
   "main": "dist/index.mjs",
   "type": "module",
-  "files": [
-    "dist/index.d.mts",
-    "dist/index.mjs"
-  ],
   "scripts": {
     "dev": "vite",
     "build:page": "vite build",
