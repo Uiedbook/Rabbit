@@ -1,17 +1,26 @@
 {
-  "name": "rabbit",
-  "version": "1.0.0",
-  "description": "",
-  "main": "editor.js",
+  "name": "Rabbit.js",
+  "version": "0.0.0",
+  "description": "A bare bone Text Editor library for javascript, Aimed to be small, simple, efficient and easy to extend.",
+  "main": "dist/index.mjs",
+  "type": "module",
+  "files": [
+    "dist/index.d.mts",
+    "dist/index.mjs"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build:page": "vite build",
+    "build": "deno run --allow-all build.ts && tsup lib/index.ts && npm pack && mv Rabbit.js-0.0.0.tgz ~"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cradova": "file:../../cradova-3.1.3.tgz",
+  "keywords": [
+    "text editor"
+  ],
+  "author": "friday candour",
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2",
     "vite": "^4.4.9"
   }
 }

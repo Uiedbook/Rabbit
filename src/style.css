@@ -48,7 +48,7 @@ p:focus {
   outline: none;
   display: flex;
   flex-direction: column;
-  background-image: url(./rabbit-bg.png);
+  /* background-image: url(./rabbit-bg.png); */
   background-size: 16%;
   background-repeat: no-repeat;
   background-position: center;

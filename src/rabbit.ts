@@ -1,25 +1,20 @@
-import { button, div, img, p } from "cradova";
-import { throttle } from "./tools";
+import { css, throttle } from "./tools";
 import redo from "./icons/redo.png";
 import undo from "./icons/undo.png";
 
-import {
-  ACTION_TYPES,
-  BEHAVIOR_TYPES,
-  DocumentAction,
-  SyntheticAction,
-} from "./types";
+import { ACTION_TYPES, BEHAVIOR_TYPES, SyntheticAction } from "./types";
+import { me } from "./tools";
 
 export class Rabbit {
-  _el: HTMLElement;
-  _Mel: HTMLElement;
+  _el: HTMLElement | undefined;
+  _Mel: HTMLElement | undefined;
   _undoStack: string[] = [];
   _redoStack: string[] = [];
   _STACK_SIZE: number = 1000;
   _STACKING_TIME: number = 600;
-  _toolsList = {};
-  _modalList = {};
-  _syntheticActionList = [];
+  _toolsList: Record<string, any> = {};
+  _modalList: Record<string, any> = {};
+  _syntheticActionList: Record<string, any> = {};
   selection: string | null = null;
   selectedElement: HTMLParagraphElement | null = null;
   range: Range | null = null;
@@ -48,6 +43,7 @@ export class Rabbit {
     } else {
       el.className = "rabbit-editor-container";
     }
+    css();
     el!.contentEditable = "true";
     this._el = el;
     this._createDefaultTools();
@@ -81,18 +77,18 @@ export class Rabbit {
       this._actionList[type] = [action];
     }
   }
-  installModalTool(call: string, html: () => HTMLElement) {
-    this._modalList[call] = html as () => HTMLElement;
+  installModalTool(call: string, html: (data: any) => HTMLDivElement) {
+    this._modalList[call] = html;
   }
-  showModal(call: string, data) {
-    this._Mel.innerHTML = "";
-    this._Mel.appendChild(this._modalList[call](data));
-    this._Mel.classList.remove("in-active");
-    this._Mel.classList.add("active");
+  showModal(call: string, data: unknown) {
+    this._Mel!.innerHTML = "";
+    this._Mel!.appendChild(this._modalList[call](data));
+    this._Mel!.classList.remove("in-active");
+    this._Mel!.classList.add("active");
   }
   hideModal() {
-    this._Mel.classList.remove("active");
-    this._Mel.classList.add("in-active");
+    this._Mel!.classList.remove("active");
+    this._Mel!.classList.add("in-active");
   }
   fireSyntheticAction(type: SyntheticAction) {
     // @ts-ignore
@@ -109,20 +105,21 @@ export class Rabbit {
         if (lineText && node.parentNode?.nodeName !== "P") {
           const pElement = document.createElement("p");
           pElement.textContent = lineText;
-          if (!node.parentNode!.id) {
-            node.parentNode!.insertAdjacentElement("afterend", pElement);
-            node.parentNode!.remove();
+          const par = node.parentNode as HTMLElement;
+          if (!par!.id) {
+            par!.insertAdjacentElement("afterend", pElement);
+            par!.remove();
           } else {
             // @ts-ignore
             node.remove();
             range.deleteContents();
             range.insertNode(pElement);
             selection.removeRange(range);
-            this._el.focus();
+            this._el!.focus();
           }
         }
       }
-      this._el.focus();
+      this._el!.focus();
     };
     // auto get selection content
     const getSelection = async () => {
@@ -184,13 +181,19 @@ export class Rabbit {
     for (const command in this._toolsList) {
       let l: HTMLElement | null = null;
       if (this._toolsList[command].image) {
-        l = img({
+        l = me("img", {
           src: this._toolsList[command].image,
           className: "rabbit-tool",
         });
       }
       if (this._toolsList[command].text) {
-        l = button(this._toolsList[command].text, { className: "rabbit-tool" });
+        l = me(
+          "button",
+          {
+            className: "rabbit-tool",
+          },
+          this._toolsList[command].text
+        );
       }
       if (this._toolsList[command].html) {
         this._toolsList[command].html.className = "rabbit-tool";
@@ -202,21 +205,21 @@ export class Rabbit {
     }
     toolContainer.appendChild(modal);
     this._Mel = modal;
-    this._el.parentElement?.appendChild(toolContainer);
+    this._el!.parentElement?.appendChild(toolContainer);
   }
 
-  async _apply(command) {
+  async _apply(command: string) {
     const fn = this._toolsList[command].tooling;
     fn({
       selectedElement: this.selectedElement,
       selection: this.selection,
       range: this.range,
     });
-    this._el.focus();
+    this._el!.focus();
   }
   // Method for saving editor state
   _saveState() {
-    const content = this._el.innerHTML;
+    const content = this._el!.innerHTML;
     // @ts-ignore
     if (content !== this._undoStack.at(-1)) {
       this._undoStack.push(content);
@@ -227,23 +230,23 @@ export class Rabbit {
   // Method for undoing changes
   _undo() {
     if (this._undoStack.length > 0) {
-      const currentState = this._el.innerHTML;
+      const currentState = this._el!.innerHTML;
       this._redoStack.push(currentState);
       const previousState = this._undoStack.pop();
       if (previousState) {
-        this._el.innerHTML = previousState;
+        this._el!.innerHTML = previousState;
       }
     }
   }
   // Method for redoing changes
   _redo() {
     if (this._redoStack.length > 0) {
-      const currentState = this._el.innerHTML;
+      const currentState = this._el!.innerHTML;
       this._undoStack.push(currentState);
 
       const nextState = this._redoStack.pop();
       if (nextState) {
-        this._el.innerHTML = nextState;
+        this._el!.innerHTML = nextState;
       }
     }
   }
@@ -255,7 +258,7 @@ export class Rabbit {
         } else if (type.includes("synthetic-")) {
           this._syntheticActionList[type] = actions[0];
         } else {
-          this._el.addEventListener(type, actions[i]);
+          this._el!.addEventListener(type, actions[i]);
         }
       }
     }

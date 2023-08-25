@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["esnext", "esnext", "dom", "dom.iterable"],
+    "declaration": true,
+    "outDir": "./lib",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": false,
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "exclude": ["node_modules", "lib/types"],
+  "include": ["./src", "index.d.ts"]
+}
