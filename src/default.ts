@@ -217,7 +217,7 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
         "div",
         { className: "flex-x mw flex-cx" },
         me("span"),
-        me("input", {
+        me("img", {
           style: { width: "24px" },
           src: x_icon,
           onclick() {
@@ -227,7 +227,7 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
       ),
       me("input", { placeholder: "input link here", id: "link-input" }),
       me(
-        "div",
+        "button",
         {
           onclick() {
             const url = u<HTMLInputElement>("#link-input")!.value;

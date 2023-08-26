@@ -21,8 +21,14 @@ export const me = (
     // @ts-ignore
     ele[attr] = attrs[attr as keyof Attr];
   }
-  for (const chil in chils) {
-    ele.append(...chil);
+  for (let i = 0; i < chils.length; i++) {
+    const chil = chils[i];
+    if (chil instanceof HTMLElement) {
+      ele.appendChild(chil);
+    }
+    if (typeof chil === "string") {
+      ele.innerText = chil;
+    }
   }
   return ele as any;
 };
@@ -32,47 +38,47 @@ export const u = <E>(q: string) => document.querySelector(q) as E;
 export const css = () => {
   const styE = document.createElement("style");
   styE.innerHTML = `
-  body,
-html {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  background-color: white;
-}
-
-* {
+.rabbit-editor-container * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-weight: unset;
-}
-p {
-  transition: color 0.6s ease-in-out;
+  width: unset;
+  min-width: unset;
+  line-height: unset;
+  font-size: unset;
+  max-width: unset;
+  text-align: start;
 }
 
-p:hover,
-p:active,
-p:focus {
+.rabbit-editor-container p {
+  transition: color 0.4s ease-in-out, background-color 0.6s ease-in-out;
+}
+
+.rabbit-editor-container p:hover,
+.rabbit-editor-container p:active,
+.rabbit-editor-container p:focus {
   color: #444141;
+  background-color: hsl(0deg 0% 0% / 7%) !important;
 }
 
-::-webkit-scrollbar {
+.rabbit-editor-container::-webkit-scrollbar {
   width: 4px !important;
   height: 4px !important;
 }
 
-::-webkit-scrollbar-thumb {
+.rabbit-editor-container::-webkit-scrollbar-thumb {
   background-color: hsl(0deg 0% 0% / 20%) !important;
   outline: 1px solid hsl(0deg 0% 0% / 20%) !important;
   border-radius: 15px !important;
 }
 
-::-webkit-scrollbar-track {
+.rabbit-editor-container::-webkit-scrollbar-track {
   background-color: hsl(0deg 0% 0% / 20%);
 }
 
 .rabbit-editor-container {
-  padding: 3px;
+  padding: 3px 0px;
   width: 100%;
   height: 94vh;
   margin: 0px auto;
@@ -129,7 +135,7 @@ p:focus {
   margin-bottom: 6vh;
 }
 
-.rabbit-modal {
+.rabbit-tool-container .rabbit-modal {
   /* border: 1px red solid; */
   position: fixed;
   transform: scale(0);
@@ -143,44 +149,45 @@ p:focus {
   box-shadow: 0px 8px 30px rgba(128, 128, 128, 0.7);
 }
 
-.rabbit-modal.mobile {
+.rabbit-tool-container .rabbit-modal.mobile {
   min-height: 60vh;
   min-width: 90vh;
 }
 
-.rabbit-modal.active {
-  animation: mu 0.5s ease-in forwards;
-}
-.rabbit-modal.in-active {
-  animation: md 0.3s ease-in forwards;
+.rabbit-tool-container .rabbit-modal.active {
+  animation: rabbit-editor-mu 0.5s ease-in forwards;
 }
 
-.flex-x {
+.rabbit-tool-container .rabbit-modal.in-active {
+  animation: rabbit-editor-md 0.3s ease-in forwards;
+}
+
+.rabbit-tool-container .flex-x {
   display: flex;
   align-items: center;
 }
 
-.mw {
+.rabbit-tool-container .mw {
   width: 100%;
 }
 
-.flex-cx {
+.rabbit-tool-container .flex-cx {
   justify-content: space-between;
 }
 
-.flex-y {
+.rabbit-tool-container .flex-y {
   display: flex;
   align-items: center;
   flex-direction: column;
 }
 
-.flex-c {
+.rabbit-tool-container .flex-c {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-@keyframes mu {
+@keyframes rabbit-editor-mu {
   from {
     transform: scale(0.5);
   }
@@ -189,7 +196,7 @@ p:focus {
   }
 }
 
-@keyframes md {
+@keyframes rabbit-editor-md {
   from {
     transform: scale(1);
   }
@@ -197,7 +204,6 @@ p:focus {
     transform: scale(0);
   }
 }
-
-  `;
+`;
   document.head.appendChild(styE);
 };

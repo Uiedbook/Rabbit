@@ -3,11 +3,14 @@
   "version": "0.0.0",
   "description": "A bare bone Text Editor library for javascript, Aimed to be small, simple, efficient and easy to extend.",
   "main": "dist/index.mjs",
-  "type": "module",
+  "files": [
+    "./dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build:page": "vite build",
-    "build": "deno run --allow-all build.ts && tsup lib/index.ts && npm pack && mv Rabbit.js-0.0.0.tgz ~"
+    "build": "deno run --allow-all build.ts && tsup lib/index.ts && npm run pack",
+    "pack": "npm pack && mv Rabbit.js-0.0.0.tgz ~"
   },
   "keywords": [
     "text editor"

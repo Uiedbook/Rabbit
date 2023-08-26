@@ -4,7 +4,7 @@ import path from "node:path";
 const rg = (str: string) => {
   const slashes = str.split("/");
   // @ts-ignore
-  const link = "./rabbit/icons/" + slashes.at(-1).split(`\"`)[0];
+  const link = "/rabbit_assets/" + slashes.at(-1).split(`\"`)[0];
   const name = slashes[0].split(" ")[1];
   return [name, link];
 };

@@ -11,7 +11,7 @@ export class Rabbit {
   _undoStack: string[] = [];
   _redoStack: string[] = [];
   _STACK_SIZE: number = 1000;
-  _STACKING_TIME: number = 600;
+  _STACKING_TIME: number = 400;
   _toolsList: Record<string, any> = {};
   _modalList: Record<string, any> = {};
   _syntheticActionList: Record<string, any> = {};
