@@ -99,19 +99,36 @@
   /* border: 1px red solid; */
   position: fixed;
   transform: scale(0);
-  min-height: 50vh;
-  min-width: 60vh;
-  top: 20vh;
+  /* min-height: 49vh; */
+  min-width: 49vh;
+  top: 30vh;
   background-color: hsl(0, 0%, 90%);
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 16px;
   margin: auto;
-  box-shadow: 0px 8px 30px rgba(128, 128, 128, 0.7);
+  box-shadow: 0px 8px 430px rgba(128, 128, 128, 0.9);
 }
 
-.rabbit-tool-container .rabbit-modal.mobile {
+/* .rabbit-tool-container .rabbit-modal.mobile {
   min-height: 60vh;
   min-width: 90vh;
+} */
+
+.rabbit-tool-container .rabbit-modal input {
+  min-height: 26px;
+  min-width: 90%;
+  padding: 7px;
+  border-radius: 12px;
+  margin: 12px auto;
+}
+
+.rabbit-tool-container .rabbit-modal .btn {
+  min-height: 18px;
+  min-width: 60%;
+  padding: 4px;
+  border-radius: 18px;
+  margin: 6px auto;
+  background-color: white;
 }
 
 .rabbit-tool-container .rabbit-modal.active {
@@ -149,7 +166,7 @@
 
 @keyframes rabbit-editor-mu {
   from {
-    transform: scale(0.5);
+    transform: scale(0.6);
   }
   to {
     transform: scale(1);
@@ -157,10 +174,15 @@
 }
 
 @keyframes rabbit-editor-md {
-  from {
-    transform: scale(1);
+  0% {
+    transform: scale(1.07);
+    top: 30vh;
   }
-  to {
+  98% {
+    transform: scale(0.7);
+    top: 70vh;
+  }
+  100% {
     transform: scale(0);
   }
 }

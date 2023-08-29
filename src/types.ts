@@ -40,6 +40,7 @@ export type ACTION_TYPES =
   | "input"
   | "paste"
   | "copy"
+  | "click"
   | "contextmenu"
   | "document-selectionchange"
   | SyntheticAction

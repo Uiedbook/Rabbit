@@ -1,26 +1,64 @@
 // really simple thing to do
-export const throttle = (cb, time) => {
+export const throttle = (
+  cb: { (): void; (arg0: any): void },
+  time: number | undefined
+) => {
   let debID: number | undefined;
   return (...args: any) => {
     if (debID) {
       clearTimeout(debID);
     }
     debID = setTimeout(() => {
+      // @ts-ignore
       cb(...args);
     }, time);
   };
 };
 
-export const me = (
+type DataAttributes = { [key: `data-${string}`]: string };
+type AriaAttributes = { [key: `aria-${string}`]: string };
+
+type Attr<T> =
+  | {
+      style?: Partial<CSSStyleDeclaration>;
+      ref: El_ref;
+    }
+  | Partial<T>
+  | Partial<DataAttributes>
+  | Partial<AriaAttributes>;
+
+export const me = <T = HTMLElement>(
   tag: string,
-  attrs?: Record<string, any>,
+  attrs?: Attr<T>,
   ...chils: HTMLElement[] | string[]
 ) => {
   const ele = document.createElement(tag);
+
   for (const attr in attrs) {
+    if (typeof attrs === "string") {
+      ele.innerText = attrs;
+      break;
+    }
+    if (attrs instanceof HTMLElement) {
+      ele.appendChild(attrs);
+      break;
+    }
+    if (Array.isArray(attrs[attr as keyof Attr<unknown>])) {
+      const ref = attrs[attr as keyof Attr<unknown>] as any;
+      if (ref[0] instanceof El_ref) {
+        ref[0].dom[ref[1]] = ele;
+      }
+      continue;
+    }
+    if (attr === "style") {
+      // @ts-ignore
+      Object.assign(ele.style, attrs[attr]);
+      continue;
+    }
     // @ts-ignore
     ele[attr] = attrs[attr as keyof Attr];
   }
+
   for (let i = 0; i < chils.length; i++) {
     const chil = chils[i];
     if (chil instanceof HTMLElement) {
@@ -34,6 +72,15 @@ export const me = (
 };
 
 export const u = <E>(q: string) => document.querySelector(q) as E;
+export class El_ref {
+  dom: Record<string, HTMLElement | undefined> = {};
+  setAs(name: string) {
+    return [this, name] as unknown as this;
+  }
+  E<T = HTMLElement>(name: string) {
+    return this.dom[name] as T | undefined;
+  }
+}
 
 export const css = () => {
   const styE = document.createElement("style");
@@ -139,19 +186,36 @@ export const css = () => {
   /* border: 1px red solid; */
   position: fixed;
   transform: scale(0);
-  min-height: 50vh;
-  min-width: 60vh;
-  top: 20vh;
+  /* min-height: 49vh; */
+  min-width: 49vh;
+  top: 30vh;
   background-color: hsl(0, 0%, 90%);
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 16px;
   margin: auto;
-  box-shadow: 0px 8px 30px rgba(128, 128, 128, 0.7);
+  box-shadow: 0px 8px 430px rgba(128, 128, 128, 0.9);
 }
 
-.rabbit-tool-container .rabbit-modal.mobile {
+/* .rabbit-tool-container .rabbit-modal.mobile {
   min-height: 60vh;
   min-width: 90vh;
+} */
+
+.rabbit-tool-container .rabbit-modal input {
+  min-height: 26px;
+  min-width: 90%;
+  padding: 7px;
+  border-radius: 12px;
+  margin: 12px auto;
+}
+
+.rabbit-tool-container .rabbit-modal .btn {
+  min-height: 18px;
+  min-width: 60%;
+  padding: 4px;
+  border-radius: 18px;
+  margin: 6px auto;
+  background-color: white;
 }
 
 .rabbit-tool-container .rabbit-modal.active {
@@ -189,7 +253,7 @@ export const css = () => {
 
 @keyframes rabbit-editor-mu {
   from {
-    transform: scale(0.5);
+    transform: scale(0.6);
   }
   to {
     transform: scale(1);
@@ -197,13 +261,19 @@ export const css = () => {
 }
 
 @keyframes rabbit-editor-md {
-  from {
-    transform: scale(1);
+  0% {
+    transform: scale(1.07);
+    top: 30vh;
   }
-  to {
+  98% {
+    transform: scale(0.7);
+    top: 70vh;
+  }
+  100% {
     transform: scale(0);
   }
 }
+
 `;
   document.head.appendChild(styE);
 };

@@ -11,9 +11,9 @@ export class Rabbit {
   _undoStack: string[] = [];
   _redoStack: string[] = [];
   _STACK_SIZE: number = 1000;
-  _STACKING_TIME: number = 400;
+  _STACKING_TIME: number = 200;
   _toolsList: Record<string, any> = {};
-  _modalList: Record<string, any> = {};
+  _modalList: Record<string, ((data: any) => HTMLDivElement)[]> = {};
   _syntheticActionList: Record<string, any> = {};
   selection: string | null = null;
   selectedElement: HTMLParagraphElement | null = null;
@@ -22,6 +22,7 @@ export class Rabbit {
     input: [],
     paste: [],
     copy: [],
+    click: [],
     contextmenu: [],
     "document-selectionchange": [],
   };
@@ -38,11 +39,13 @@ export class Rabbit {
   }
   installOn(id: string = "pub") {
     const el = document.getElementById(id)!;
-    if (window.innerWidth < 600) {
+
+    if (window.outerWidth < 601) {
       el.className = "rabbit-editor-container mobile";
     } else {
       el.className = "rabbit-editor-container";
     }
+    // console.log(window.outerWidth < 600, el);
     css();
     el!.contentEditable = "true";
     this._el = el;
@@ -77,15 +80,33 @@ export class Rabbit {
       this._actionList[type] = [action];
     }
   }
-  installModalTool(call: string, html: (data: any) => HTMLDivElement) {
+  installModalTool(call: string, html: ((data: any) => HTMLDivElement)[]) {
     this._modalList[call] = html;
   }
-  showModal(call: string, data: unknown) {
-    this._Mel!.innerHTML = "";
-    this._Mel!.appendChild(this._modalList[call](data));
-    this._Mel!.classList.remove("in-active");
-    this._Mel!.classList.add("active");
+
+  showModal(call: string, data: unknown = null) {
+    if (Array.isArray(this._modalList[call])) {
+      this._Mel!.innerHTML = "";
+      const h = this._modalList[call][0](data);
+      if (h) {
+        this._Mel!.appendChild(h);
+        this._Mel!.classList.remove("in-active");
+        this._Mel!.classList.add("active");
+      }
+    }
   }
+  navigateModal(call: string, index: number, data: unknown) {
+    if (Array.isArray(this._modalList)) {
+      this._Mel!.innerHTML = "";
+      const h = this._modalList[index][call](data);
+      if (h) {
+        this._Mel!.appendChild(h);
+        this._Mel!.classList.remove("in-active");
+        this._Mel!.classList.add("active");
+      }
+    }
+  }
+
   hideModal() {
     this._Mel!.classList.remove("active");
     this._Mel!.classList.add("in-active");
@@ -100,22 +121,23 @@ export class Rabbit {
       const selection = window.getSelection()!;
       if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
-        const node = range.startContainer;
-        const lineText = node.textContent || "";
-        if (lineText && node.parentNode?.nodeName !== "P") {
+        const node = range.startContainer as HTMLElement;
+        const par = node.parentNode as HTMLElement;
+        if (par.nodeName !== "P") {
           const pElement = document.createElement("p");
-          pElement.textContent = lineText;
-          const par = node.parentNode as HTMLElement;
-          if (!par!.id) {
+          pElement.textContent = node.textContent || "";
+          if (par!.id !== "pub" && node.id !== "pub") {
             par!.insertAdjacentElement("afterend", pElement);
             par!.remove();
-          } else {
-            // @ts-ignore
-            node.remove();
             range.deleteContents();
             range.insertNode(pElement);
             selection.removeRange(range);
-            this._el!.focus();
+          }
+        } else {
+          if (node.nodeName === "IMG") {
+            par.removeChild(node);
+            par!.insertAdjacentElement("afterend", node);
+            console.log(node, par);
           }
         }
       }
@@ -171,7 +193,7 @@ export class Rabbit {
     const toolContainer = document.createElement("div");
     const modal = document.createElement("div");
 
-    if (window.innerWidth < 600) {
+    if (window.outerWidth < 601) {
       toolContainer.className = "rabbit-tool-container mobile";
       modal.className = "rabbit-modal mobile";
     } else {
