@@ -1,17 +1,17 @@
-import { css, throttle } from "./tools";
+import { throttle } from "./tools";
 import redo from "./icons/redo.png";
 import undo from "./icons/undo.png";
-
-import { ACTION_TYPES, BEHAVIOR_TYPES, SyntheticAction } from "./types";
+import { css } from "./css";
 import { me } from "./tools";
+import { ACTION_TYPES, BEHAVIOR_TYPES, SyntheticAction } from "./types";
 
 export class Rabbit {
   _el: HTMLElement | undefined;
   _Mel: HTMLElement | undefined;
-  _undoStack: string[] = [];
-  _redoStack: string[] = [];
+  _doStack: string[] = [];
+  _do_index: number = 0;
   _STACK_SIZE: number = 1000;
-  _STACKING_TIME: number = 200;
+  _STACKING_TIME: number = 100;
   _toolsList: Record<string, any> = {};
   _modalList: Record<string, ((data: any) => HTMLDivElement)[]> = {};
   _syntheticActionList: Record<string, any> = {};
@@ -48,7 +48,9 @@ export class Rabbit {
     // console.log(window.outerWidth < 600, el);
     css();
     el!.contentEditable = "true";
+    el!.innerHTML = "<p>Start Typing .... </p>";
     this._el = el;
+
     this._createDefaultTools();
     this._createDefaultActions();
     this._installTools();
@@ -162,14 +164,43 @@ export class Rabbit {
         }
       }
     };
+
+    const active = async (e: any) => {
+      const element = e.target as HTMLParagraphElement;
+      if (element.tagName === "P") {
+        this.selectedElement = element;
+        // console.log(element.innerText.trim().length === 0);
+        if (!element.innerText.trim()) {
+          element.removeAttribute("style");
+        }
+      }
+    };
+    document.addEventListener("keydown", async (ke) => {
+      if (/(ArrowUp|ArrowDown|Enter)/.test(ke.key)) {
+        const select = window.getSelection()!;
+        if (select.rangeCount > 0) {
+          const range = select.getRangeAt(0);
+          const node = range.startContainer;
+          if (node.parentNode?.nodeName === "P") {
+            this.selectedElement =
+              node.parentNode as unknown as HTMLParagraphElement;
+            this.range = range as typeof range;
+            if (!this.selectedElement.innerText.trim()) {
+              this.selectedElement.removeAttribute("style");
+            }
+          }
+        }
+      }
+    });
     // auto format
     // const auto_format_throttler = throttle(autoformat, 0);
     // auto save
-    const auto_save_throttler = throttle(() => {
+    const auto_save_throttler = throttle(async () => {
       this._saveState();
     }, this._STACKING_TIME);
     this._actionList["input"].push(auto_save_throttler, autoformat);
     this._actionList["document-selectionchange"].push(getSelection);
+    this._actionList["click"].push(active);
   }
   _createDefaultTools() {
     const ins = this;
@@ -183,9 +214,6 @@ export class Rabbit {
       image: undo,
       tooling() {
         ins._undo();
-        if (ins._undoStack.length > ins._STACK_SIZE) {
-          ins._undoStack.length = ins._STACK_SIZE;
-        }
       },
     };
   }
@@ -241,32 +269,30 @@ export class Rabbit {
   }
   // Method for saving editor state
   _saveState() {
+    if (this._doStack.length > this._STACK_SIZE) {
+      this._doStack.length = this._STACK_SIZE;
+    }
     const content = this._el!.innerHTML;
     // @ts-ignore
-    if (content !== this._undoStack.at(-1)) {
-      this._undoStack.push(content);
-      this._redoStack = [];
+    if (content !== this._doStack.at(-1)) {
+      this._doStack.push(content);
+      this._do_index = this._doStack.length - 1;
     }
   }
 
-  // Method for undoing changes
   _undo() {
-    if (this._undoStack.length > 0) {
-      const currentState = this._el!.innerHTML;
-      this._redoStack.push(currentState);
-      const previousState = this._undoStack.pop();
+    if (this._doStack.length > 0) {
+      this._do_index -= 1;
+      const previousState = this._doStack.at(this._do_index);
       if (previousState) {
         this._el!.innerHTML = previousState;
       }
     }
   }
-  // Method for redoing changes
   _redo() {
-    if (this._redoStack.length > 0) {
-      const currentState = this._el!.innerHTML;
-      this._undoStack.push(currentState);
-
-      const nextState = this._redoStack.pop();
+    if (this._doStack.length > 0) {
+      this._do_index += 1;
+      const nextState = this._doStack.at(this._do_index);
       if (nextState) {
         this._el!.innerHTML = nextState;
       }

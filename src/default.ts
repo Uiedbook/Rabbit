@@ -77,35 +77,35 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
   //   },
   // });
 
-  Rabbit.installTool("BackgroundColor", {
-    image: bg,
-    tooling({ selectedElement, selection, range }) {
-      // console.log(selection, selectedElement);
-      const input = document.createElement("input");
-      input.type = "color";
-      input.addEventListener("change", (e) => {
-        const color = (e.target! as HTMLInputElement).value;
-        if (selectedElement) {
-          if (selection) {
-            if (selection === selectedElement.innerText) {
-              if (selectedElement?.style.backgroundColor === color) {
-                selectedElement!.style.backgroundColor = "unset";
-              } else {
-                selectedElement!.style.backgroundColor = color;
-              }
-            } else {
-              const span = document.createElement("span");
-              span.innerText = selection;
-              span.style.color = color;
-              range!.deleteContents();
-              range!.insertNode(span);
-            }
-          }
-        }
-      });
-      input.click();
-    },
-  });
+  // Rabbit.installTool("BackgroundColor", {
+  //   image: bg,
+  //   tooling({ selectedElement, selection, range }) {
+  //     // console.log(selection, selectedElement);
+  //     const input = document.createElement("input");
+  //     input.type = "color";
+  //     input.addEventListener("change", (e) => {
+  //       const color = (e.target! as HTMLInputElement).value;
+  //       if (selectedElement) {
+  //         if (selection) {
+  //           if (selection === selectedElement.innerText) {
+  //             if (selectedElement?.style.backgroundColor === color) {
+  //               selectedElement!.style.backgroundColor = "unset";
+  //             } else {
+  //               selectedElement!.style.backgroundColor = color;
+  //             }
+  //           } else {
+  //             const span = document.createElement("span");
+  //             span.innerText = selection;
+  //             span.style.color = color;
+  //             range!.deleteContents();
+  //             range!.insertNode(span);
+  //           }
+  //         }
+  //       }
+  //     });
+  //     input.click();
+  //   },
+  // });
 
   Rabbit.installTool("Image", {
     image: img_icon,
@@ -134,12 +134,12 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
     },
   });
 
-  Rabbit.installTool("Asset", {
-    image: add,
-    tooling() {
-      Rabbit.showModal("assets");
-    },
-  });
+  // Rabbit.installTool("Asset", {
+  //   image: add,
+  //   tooling() {
+  //     Rabbit.showModal("assets");
+  //   },
+  // });
 
   Rabbit.installTool("Link", {
     image: link,
@@ -168,7 +168,6 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
       (window as unknown as { clipboardData: object }).clipboardData;
     const text = clipboardData.getData("text/plain");
     const file = clipboardData.files[0];
-
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -185,11 +184,13 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
     }
     // console.log({ text });
     if (text) {
-      const p = document.createElement("p");
-      p.innerText = (text as string).replace(/\n/g, "");
-      if (Rabbit.selectedElement) {
-        Rabbit.selectedElement?.insertAdjacentElement("afterend", p);
+      if (Rabbit.selectedElement && !Rabbit.selectedElement.innerText.trim()) {
+        Rabbit.selectedElement.innerText = (text as string).replace(/\n/g, "");
       } else {
+        const p = document.createElement("p");
+        p.innerText = (text as string).replace(/\n/g, "");
+        // @ts-ignore
+        Rabbit.selectedElement?.insertAdjacentElement("afterend", p);
         Rabbit._el!.appendChild(p);
       }
     }
@@ -247,37 +248,37 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
     },
   ]);
 
-  Rabbit.installModalTool("assets", [
-    () => {
-      return me(
-        "div",
-        { className: "flex-y mw" },
-        me(
-          "div",
-          { className: "flex-x mw flex-cx" },
-          me("span"),
-          me("img", {
-            style: { width: "24px" },
-            src: x_icon,
-            onclick() {
-              Rabbit.hideModal();
-            },
-          })
-        ),
-        me("input", { placeholder: "input link here", id: "link-input" }),
-        me(
-          "button",
-          {
-            className: "btn",
-            onclick() {
-              Rabbit.hideModal();
-            },
-          },
-          "Done"
-        )
-      );
-    },
-  ]);
+  // Rabbit.installModalTool("assets", [
+  //   () => {
+  //     return me(
+  //       "div",
+  //       { className: "flex-y mw" },
+  //       me(
+  //         "div",
+  //         { className: "flex-x mw flex-cx" },
+  //         me("span"),
+  //         me("img", {
+  //           style: { width: "24px" },
+  //           src: x_icon,
+  //           onclick() {
+  //             Rabbit.hideModal();
+  //           },
+  //         })
+  //       ),
+  //       me("input", { placeholder: "input link here", id: "link-input" }),
+  //       me(
+  //         "button",
+  //         {
+  //           className: "btn",
+  //           onclick() {
+  //             Rabbit.hideModal();
+  //           },
+  //         },
+  //         "Done"
+  //       )
+  //     );
+  //   },
+  // ]);
 
   Rabbit.installModalTool("image-tool", [
     (image) => {
@@ -374,7 +375,7 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
 
   Rabbit.installModalTool("text-setting", [
     (element) => {
-      console.log(element);
+      // console.log(element);
       return me(
         "div",
         { className: "flex-y mw" },
@@ -397,7 +398,11 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             "h3",
             {
               onclick() {
-                element.style.fontWeight = "bold";
+                if (element.style.fontWeight !== "bold") {
+                  element.style.fontWeight = "bold";
+                } else {
+                  element.style.fontWeight = "unset";
+                }
               },
             },
             "Bold"
@@ -406,8 +411,11 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             "h3",
             {
               onclick() {
-                element.style.fontSize = "30px";
-                element.style.fontStyle = "bold";
+                if (element.style.fontSize !== "30px") {
+                  element.style.fontSize = "30px";
+                } else {
+                  element.style.fontSize = "unset";
+                }
               },
             },
             "Main Header"
@@ -416,8 +424,11 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             "h3",
             {
               onclick() {
-                element.style.fontSize = "22px";
-                element.style.fontStyle = "bold";
+                if (element.style.fontSize !== "22px") {
+                  element.style.fontSize = "22px";
+                } else {
+                  element.style.fontSize = "unset";
+                }
               },
             },
             "Small Header"
@@ -426,7 +437,11 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             "h3",
             {
               onclick() {
-                element.style.fontSize = "16px";
+                if (element.style.fontSize !== "16px") {
+                  element.style.fontSize = "16px";
+                } else {
+                  element.style.fontSize = "unset";
+                }
               },
             },
             "Normal"
@@ -435,7 +450,11 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             "h3",
             {
               onclick() {
-                element.style.fontStyle = "italic";
+                if (element.style.fontStyle !== "italic") {
+                  element.style.fontStyle = "italic";
+                } else {
+                  element.style.fontStyle = "unset";
+                }
               },
             },
             "Italic"
@@ -444,7 +463,11 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             "h3",
             {
               onclick() {
-                element.style.textDecoration = "underline";
+                if (element.style.textDecoration !== "underline") {
+                  element.style.textDecoration = "underline";
+                } else {
+                  element.style.textDecoration = "unset";
+                }
               },
             },
             "Underline"
@@ -453,7 +476,11 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             "h3",
             {
               onclick() {
-                element.style.textDecoration = "line-through";
+                if (element.style.textDecoration !== "line-through") {
+                  element.style.textDecoration = "line-through";
+                } else {
+                  element.style.textDecoration = "unset";
+                }
               },
             },
             "Strike"

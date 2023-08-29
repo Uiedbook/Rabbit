@@ -1,3 +1,4 @@
+/* rabbit css */
 .rabbit-editor-container * {
   margin: 0;
   padding: 0;
@@ -38,7 +39,7 @@
 }
 
 .rabbit-editor-container {
-  padding: 3px 0px;
+  padding: 3px;
   width: 100%;
   height: 94vh;
   margin: 0px auto;
@@ -186,3 +187,4 @@
     transform: scale(0);
   }
 }
+/* rabbit css */

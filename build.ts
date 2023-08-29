@@ -55,6 +55,7 @@ function processFiles(srcDir = "./src", destDir = "./lib") {
   const destPath = path.join(destDir, destDir);
   ensureDirectoryExistence(destPath);
   // walking dir tree
+  let CssFile = { destPath: null, fileContent: null };
   fs.readdirSync(srcDir, { withFileTypes: true }).forEach((entry) => {
     const srcPath = path.join(srcDir, entry.name);
     const destPath = path.join(destDir, entry.name);
@@ -62,13 +63,34 @@ function processFiles(srcDir = "./src", destDir = "./lib") {
       processFiles(srcPath, destPath);
     } else {
       let fileContent = fs.readFileSync(srcPath, "utf-8");
+
+      if (entry.isFile() && entry.name === "style.css") {
+        const minifiedCSS = minifyCSS(fileContent);
+        // @ts-ignore
+        CssFile.fileContent = CssFile.fileContent.replace("{css}", minifiedCSS);
+        fs.writeFileSync(CssFile.destPath, CssFile.fileContent);
+      }
+
       if (entry.isFile() && [".js", ".ts"].includes(path.extname(entry.name))) {
-        // Modify fileContent
+        if (entry.name === "css.ts") {
+          CssFile.destPath = destPath;
+          CssFile.fileContent = fileContent;
+        }
         fileContent = replacer(fileContent);
       }
+
       fs.writeFileSync(destPath, fileContent);
     }
   });
 }
 processFiles();
+function minifyCSS(css) {
+  return css
+    .replace(/\s+/g, " ")
+    .replace(/\/\*.*?\*\//g, "")
+    .replace(/(\s*:\s*)/g, ":")
+    .replace(/(\s*;\s*)/g, ";")
+    .replace(/;}/g, "}")
+    .trim();
+}
 console.log("Files processed and written to the destination directory.");
