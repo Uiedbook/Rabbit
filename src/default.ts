@@ -1,10 +1,10 @@
 import link from "./icons/link.png";
-import txt from "./icons/txt.png";
-import color from "./icons/color.png";
-import add from "./icons/add.png";
-import bg from "./icons/bg.png";
+// import txt from "./icons/txt.png";
+// import color from "./icons/color.png";
+// import add from "./icons/add.png";
+// import bg from "./icons/bg.png";
 import left from "./icons/left.png";
-import center from "./icons/center.png";
+// import center from "./icons/center.png";
 import centerb from "./icons/senter.png";
 import right from "./icons/right.png";
 import heading from "./icons/heading.png";
