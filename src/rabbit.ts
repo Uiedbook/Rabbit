@@ -37,7 +37,7 @@ export class Rabbit {
       this._STACKING_TIME = STACKING_TIME;
     }
   }
-  installOn(id: string = "pub") {
+  installOn(id: string = "pub", html?: string) {
     const el = document.getElementById(id)!;
 
     if (window.outerWidth < 601) {
@@ -48,9 +48,12 @@ export class Rabbit {
     // console.log(window.outerWidth < 600, el);
     css();
     el!.contentEditable = "true";
-    el!.innerHTML = "<p>Start Typing .... </p>";
+    if (html) {
+      el!.innerHTML = "<p></p>" + html;
+    } else {
+      el!.innerHTML = "<p>Start Typing .... </p>";
+    }
     this._el = el;
-
     this._createDefaultTools();
     this._createDefaultActions();
     this._installTools();
