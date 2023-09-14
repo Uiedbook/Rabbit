@@ -10,6 +10,9 @@ import right from "./icons/right.png";
 import heading from "./icons/heading.png";
 import img_icon from "./icons/img.png";
 import x_icon from "./icons/x.png";
+import ad from "./icons/ad.png";
+import au from "./icons/au.png";
+import bin from "./icons/bin.png";
 import { El_ref, me, u } from "./tools";
 import { Rabbit } from "./rabbit";
 
@@ -22,30 +25,38 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
       Rabbit.showModal("text-setting", selectedElement);
     },
   });
+  Rabbit.installTool("Image", {
+    image: img_icon,
+    tooling({ selectedElement }) {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.click();
+      input.addEventListener("change", (e) => {
+        const file = (e.target! as any).files[0];
+        if (file && file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = document.createElement("img");
+            img.src = e.target!.result as string;
+            if (selectedElement) {
+              selectedElement?.insertAdjacentElement("afterend", img);
+            } else {
+              Rabbit._el!.appendChild(img);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    },
+  });
 
-  // Rabbit.installTool("Italic", {
-  //   image: txt,
-  //   tooling({ selectedElement, selection, range }) {
-  //     //   console.log(selection, selectedElement);
-  //     if (selectedElement) {
-  //       if (selection) {
-  //         if (selection === selectedElement.innerText) {
-  //           if (selectedElement?.style.fontStyle === "italic") {
-  //             selectedElement!.style.fontStyle = "unset";
-  //           } else {
-  //             selectedElement!.style.fontStyle = "italic";
-  //           }
-  //         } else {
-  //           const span = document.createElement("span");
-  //           span.innerText = selection;
-  //           span.style.fontWeight = "bold";
-  //           range!.deleteContents();
-  //           range!.insertNode(span);
-  //         }
-  //       }
-  //     }
-  //   },
-  // });
+  Rabbit.installTool("Link", {
+    image: link,
+    tooling({ selectedElement, selection, range }) {
+      Rabbit.showModal("link", { selectedElement, selection, range });
+    },
+  });
 
   // Rabbit.installTool("Color", {
   //   image: color,
@@ -107,57 +118,10 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
   //   },
   // });
 
-  Rabbit.installTool("Image", {
-    image: img_icon,
-    tooling({ selectedElement }) {
-      // console.log({ selection, selectedElement });
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/*";
-      input.click();
-      input.addEventListener("change", (e) => {
-        const file = (e.target! as any).files[0];
-        if (file && file.type.startsWith("image/")) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = document.createElement("img");
-            img.src = e.target!.result as string;
-            if (selectedElement) {
-              selectedElement?.insertAdjacentElement("afterend", img);
-            } else {
-              Rabbit._el!.appendChild(img);
-            }
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    },
-  });
-
   // Rabbit.installTool("Asset", {
   //   image: add,
   //   tooling() {
   //     Rabbit.showModal("assets");
-  //   },
-  // });
-
-  Rabbit.installTool("Link", {
-    image: link,
-    tooling({ selectedElement, selection, range }) {
-      Rabbit.showModal("link", { selectedElement, selection, range });
-    },
-  });
-
-  // Rabbit.installTool("Alignment", {
-  //   image: center,
-  //   tooling({ selection, range }) {
-  //     // console.log(selection, selectedElement);
-  //     if (selection) {
-  //       const alignedContainer = document.createElement("div");
-  //       alignedContainer.style.textAlign = "center";
-  //       alignedContainer.appendChild(range!.extractContents());
-  //       range!.insertNode(alignedContainer);
-  //     }
   //   },
   // });
 
@@ -185,18 +149,15 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
     // console.log({ text });
     if (text) {
       if (Rabbit.selectedElement && !Rabbit.selectedElement.innerText.trim()) {
-        Rabbit.selectedElement.innerText = (text as string).replace(/\n/g, "");
+        Rabbit.selectedElement.innerText = text as string; //.replace(/\n/g, "");
       } else {
         const p = document.createElement("p");
-        p.innerText = (text as string).replace(/\n/g, "");
-        // @ts-ignore
+        p.innerHTML = text as string;
         Rabbit.selectedElement?.insertAdjacentElement("afterend", p);
         Rabbit._el!.appendChild(p);
       }
     }
     Rabbit._el?.focus();
-    // console.log({ pastedText, pastedImg });
-    // document.execCommand("insertHTML", false, pastedText);
   });
   Rabbit.installAction("click", async (e: any) => {
     const element = e.target as HTMLElement;
@@ -248,42 +209,13 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
     },
   ]);
 
-  // Rabbit.installModalTool("assets", [
-  //   () => {
-  //     return me(
-  //       "div",
-  //       { className: "flex-y mw" },
-  //       me(
-  //         "div",
-  //         { className: "flex-x mw flex-cx" },
-  //         me("span"),
-  //         me("img", {
-  //           style: { width: "24px" },
-  //           src: x_icon,
-  //           onclick() {
-  //             Rabbit.hideModal();
-  //           },
-  //         })
-  //       ),
-  //       me("input", { placeholder: "input link here", id: "link-input" }),
-  //       me(
-  //         "button",
-  //         {
-  //           className: "btn",
-  //           onclick() {
-  //             Rabbit.hideModal();
-  //           },
-  //         },
-  //         "Done"
-  //       )
-  //     );
-  //   },
-  // ]);
-
   Rabbit.installModalTool("image-tool", [
     (image) => {
       const wv = image.style.width.slice(0, -2);
       const hv = image.style.height.slice(0, -2);
+      if (image.parentElement.id !== "pub") {
+        image.parentElement!.insertAdjacentElement("afterend", image);
+      }
       return me(
         "div",
         { className: "flex-y mw" },
@@ -342,7 +274,21 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             className: "",
           },
           me("img", {
-            style: { width: "2.7rem" },
+            style: { width: "1.7rem" },
+            src: ad,
+            onclick() {
+              image.previousElementSibling?.insertAdjacentElement(
+                "beforebegin",
+                image
+              );
+              Rabbit.hideModal();
+            },
+          }),
+          me("img", {
+            style: {
+              width: "2.7rem",
+              opacity: image.style.alignSelf === "flex-start" ? "1" : "0.6",
+            },
             src: left,
             onclick() {
               image.style.margin = "0px";
@@ -351,20 +297,45 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             },
           }),
           me("img", {
-            style: { width: "2.7rem" },
+            style: {
+              width: "2.7rem",
+              opacity: image.style.margin === "0px auto" ? "1" : "0.6",
+            },
             src: centerb,
             onclick() {
-              image.style.alignSelf = "inset";
+              image.style.alignSelf = "unset";
               image.style.margin = "0px auto";
               Rabbit.hideModal();
             },
           }),
           me("img", {
-            style: { width: "2.7rem" },
+            style: {
+              width: "2.7rem",
+              opacity: image.style.alignSelf === "flex-end" ? "1" : "0.6",
+            },
             src: right,
             onclick() {
               image.style.margin = "0px";
               image.style.alignSelf = "flex-end";
+              Rabbit.hideModal();
+            },
+          }),
+          me("img", {
+            style: { width: "1.7rem" },
+            src: au,
+            onclick() {
+              image.nextElementSibling?.insertAdjacentElement(
+                "afterend",
+                image
+              );
+              Rabbit.hideModal();
+            },
+          }),
+          me("img", {
+            style: { width: "1.7rem" },
+            src: bin,
+            onclick() {
+              image.remove();
               Rabbit.hideModal();
             },
           })
@@ -374,7 +345,7 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
   ]);
 
   Rabbit.installModalTool("text-setting", [
-    (element) => {
+    (element: HTMLParagraphElement) => {
       // console.log(element);
       return me(
         "div",
@@ -398,11 +369,24 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             "h3",
             {
               onclick() {
-                if (element.style.fontWeight !== "bold") {
-                  element.style.fontWeight = "bold";
-                } else {
-                  element.style.fontWeight = "unset";
-                }
+                //  const url = u<HTMLInputElement>("#link-input")!.value;
+                //  if (url) {
+                const span = document.createElement("span");
+                span.style.fontWeight = "bold";
+                span.textContent = Rabbit.selection;
+                // console.log(Rabbit.selectedElement);
+                // console.log(Range);
+
+                Rabbit.range!.deleteContents();
+                Rabbit.range!.insertNode(span);
+                //  }
+                //  Rabbit.hideModal();
+
+                // if (element.style.fontWeight !== "bold") {
+                //   element.style.fontWeight = "bold";
+                // } else {
+                //   element.style.fontWeight = "unset";
+                // }
               },
             },
             "Bold"
@@ -410,10 +394,15 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
           me(
             "h3",
             {
-              onclick() {
+              style: {
+                opacity: element.style.fontSize === "30px" ? "1" : "0.6",
+              },
+              onclick(this: any) {
                 if (element.style.fontSize !== "30px") {
                   element.style.fontSize = "30px";
+                  this.style.opacity = "1";
                 } else {
+                  this.style.opacity = "0.6";
                   element.style.fontSize = "unset";
                 }
               },
@@ -423,10 +412,15 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
           me(
             "h3",
             {
-              onclick() {
+              style: {
+                opacity: element.style.fontSize === "22px" ? "1" : "0.6",
+              },
+              onclick(this: any) {
                 if (element.style.fontSize !== "22px") {
                   element.style.fontSize = "22px";
+                  this.style.opacity = "1";
                 } else {
+                  this.style.opacity = "0.6";
                   element.style.fontSize = "unset";
                 }
               },
@@ -436,10 +430,15 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
           me(
             "h3",
             {
-              onclick() {
+              style: {
+                opacity: element.style.fontSize === "16px" ? "1" : "0.6",
+              },
+              onclick(this: any) {
                 if (element.style.fontSize !== "16px") {
                   element.style.fontSize = "16px";
+                  this.style.opacity = "1";
                 } else {
+                  this.style.opacity = "0.6";
                   element.style.fontSize = "unset";
                 }
               },
@@ -449,11 +448,16 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
           me(
             "h3",
             {
-              onclick() {
+              style: {
+                opacity: element.style.fontStyle === "italic" ? "1" : "0.6",
+              },
+              onclick(this: any) {
                 if (element.style.fontStyle !== "italic") {
                   element.style.fontStyle = "italic";
+                  this.style.opacity = "1";
                 } else {
                   element.style.fontStyle = "unset";
+                  this.style.opacity = "0.6";
                 }
               },
             },
@@ -462,11 +466,17 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
           me(
             "h3",
             {
-              onclick() {
+              style: {
+                opacity:
+                  element.style.textDecoration === "underline" ? "1" : "0.6",
+              },
+              onclick(this: any) {
                 if (element.style.textDecoration !== "underline") {
                   element.style.textDecoration = "underline";
+                  this.style.opacity = "1";
                 } else {
                   element.style.textDecoration = "unset";
+                  this.style.opacity = "0.6";
                 }
               },
             },
@@ -475,11 +485,17 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
           me(
             "h3",
             {
-              onclick() {
+              style: {
+                opacity:
+                  element.style.textDecoration === "line-through" ? "1" : "0.6",
+              },
+              onclick(this: any) {
                 if (element.style.textDecoration !== "line-through") {
                   element.style.textDecoration = "line-through";
+                  this.style.opacity = "1";
                 } else {
                   element.style.textDecoration = "unset";
+                  this.style.opacity = "0.6";
                 }
               },
             },
@@ -493,6 +509,20 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
           },
           me("img", {
             style: { width: "1.7rem" },
+            src: ad,
+            onclick() {
+              element.previousElementSibling?.insertAdjacentElement(
+                "beforebegin",
+                element
+              );
+              Rabbit.hideModal();
+            },
+          }),
+          me("img", {
+            style: {
+              width: "1.7rem",
+              opacity: element.style.textAlign === "start" ? "1" : "0.6",
+            },
             src: left,
             onclick() {
               element.style.textAlign = "start";
@@ -500,7 +530,10 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             },
           }),
           me("img", {
-            style: { width: "1.7rem" },
+            style: {
+              width: "1.7rem",
+              opacity: element.style.textAlign === "center" ? "1" : "0.6",
+            },
             src: centerb,
             onclick() {
               element.style.textAlign = "center";
@@ -508,10 +541,32 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
             },
           }),
           me("img", {
-            style: { width: "1.7rem" },
+            style: {
+              width: "1.7rem",
+              opacity: element.style.textAlign === "end" ? "1" : "0.6",
+            },
             src: right,
             onclick() {
               element.style.textAlign = "end";
+              Rabbit.hideModal();
+            },
+          }),
+          me("img", {
+            style: { width: "1.7rem" },
+            src: au,
+            onclick() {
+              element.nextElementSibling?.insertAdjacentElement(
+                "afterend",
+                element
+              );
+              Rabbit.hideModal();
+            },
+          }),
+          me("img", {
+            style: { width: "1.7rem" },
+            src: bin,
+            onclick() {
+              element.remove();
               Rabbit.hideModal();
             },
           })

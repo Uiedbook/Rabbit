@@ -11,7 +11,7 @@ export class Rabbit {
   _doStack: string[] = [];
   _do_index: number = 0;
   _STACK_SIZE: number = 1000;
-  _STACKING_TIME: number = 100;
+  _STACKING_TIME: number = 4;
   _toolsList: Record<string, any> = {};
   _modalList: Record<string, ((data: any) => HTMLDivElement)[]> = {};
   _syntheticActionList: Record<string, any> = {};
@@ -21,6 +21,7 @@ export class Rabbit {
   _actionList: Record<ACTION_TYPES, ((e: any) => void)[]> = {
     input: [],
     paste: [],
+    focus: [],
     copy: [],
     click: [],
     contextmenu: [],
@@ -49,7 +50,7 @@ export class Rabbit {
     css();
     el!.contentEditable = "true";
     if (html) {
-      el!.innerHTML = "<p></p>" + html;
+      el!.innerHTML = html;
     } else {
       el!.innerHTML = "<p>Start Typing .... </p>";
     }
@@ -128,10 +129,10 @@ export class Rabbit {
         const range = selection.getRangeAt(0);
         const node = range.startContainer as HTMLElement;
         const par = node.parentNode as HTMLElement;
-        if (par.nodeName !== "P") {
-          const pElement = document.createElement("p");
-          pElement.textContent = node.textContent || "";
+        if (par.nodeName !== "P" && node.textContent?.trim()) {
           if (par!.id !== "pub" && node.id !== "pub") {
+            const pElement = document.createElement("p");
+            pElement.textContent = node.textContent;
             par!.insertAdjacentElement("afterend", pElement);
             par!.remove();
             range.deleteContents();
@@ -146,7 +147,6 @@ export class Rabbit {
           }
         }
       }
-      this._el!.focus();
     };
     // auto get selection content
     const getSelection = async () => {
@@ -161,9 +161,11 @@ export class Rabbit {
           this.selectedElement =
             node.parentNode as unknown as HTMLParagraphElement;
           this.range = range as typeof range;
-        }
-        if (lineText && node.parentNode?.nodeName === "SPAN") {
-          node.parentNode as unknown as HTMLParagraphElement;
+        } else {
+          if (lineText && node.parentNode?.nodeName === "SPAN") {
+            this.selectedElement =
+              node.parentNode as unknown as HTMLParagraphElement;
+          }
         }
       }
     };
@@ -172,7 +174,6 @@ export class Rabbit {
       const element = e.target as HTMLParagraphElement;
       if (element.tagName === "P") {
         this.selectedElement = element;
-        // console.log(element.innerText.trim().length === 0);
         if (!element.innerText.trim()) {
           element.removeAttribute("style");
         }
@@ -188,20 +189,25 @@ export class Rabbit {
             this.selectedElement =
               node.parentNode as unknown as HTMLParagraphElement;
             this.range = range as typeof range;
+            // console.log(this.selectedElement);
             if (!this.selectedElement.innerText.trim()) {
               this.selectedElement.removeAttribute("style");
             }
           }
         }
+      } else {
+        if (ke.key === "Esc" || ke.key === "Escape") {
+          this.hideModal();
+        }
       }
     });
-    // auto format
-    // const auto_format_throttler = throttle(autoformat, 0);
     // auto save
     const auto_save_throttler = throttle(async () => {
       this._saveState();
     }, this._STACKING_TIME);
+
     this._actionList["input"].push(auto_save_throttler, autoformat);
+    this._actionList["focus"].push(auto_save_throttler, autoformat);
     this._actionList["document-selectionchange"].push(getSelection);
     this._actionList["click"].push(active);
   }

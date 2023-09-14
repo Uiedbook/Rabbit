@@ -42,6 +42,7 @@ export type ACTION_TYPES =
   | "copy"
   | "click"
   | "contextmenu"
+  | "focus"
   | "document-selectionchange"
   | SyntheticAction
   | DocumentAction;
