@@ -270,9 +270,9 @@ export const default_RabbitSetup = (Rabbit: Rabbit) => {
         ),
         me(
           "div",
-          {
-            className: "",
-          },
+          // {
+          //   className: "",
+          // },
           me("img", {
             style: { width: "1.7rem" },
             src: ad,

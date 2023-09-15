@@ -40,6 +40,7 @@ export class Rabbit {
   }
   installOn(id: string = "pub", html?: string) {
     const el = document.getElementById(id)!;
+    // console.log(el);
 
     if (window.outerWidth < 601) {
       el.className = "rabbit-editor-container mobile";
